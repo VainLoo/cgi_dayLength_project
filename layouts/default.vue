@@ -85,32 +85,6 @@ body {
   font-size: 150%;
 }
 
-@media only screen and (max-width: 768px) {
-  .wrapper {
-    display: grid;
-    grid-gap: 10px;
-    grid-template-columns: 100%;
-    background-color: #fff;
-    color: #444;
-  }
-
-  .a {
-    grid-column: 1;
-    grid-row: 1;
-  }
-  .b {
-    grid-column: 1;
-    grid-row: 4;
-  }
-  .c {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .d {
-    grid-column: 1;
-    grid-row: 3;
-  }
-}
 
 
 
