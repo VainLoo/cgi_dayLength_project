@@ -46,31 +46,14 @@
         <el-button @click="calcDayLenght">Calculate</el-button>
       </div>
     </div>
-    <div class="box d">
-      <div id="head">
-        <el-date-picker
-          v-model="range"
-          type="daterange"
-          range-separator="|"
-          start-placeholder="Start date"
-          end-placeholder="End date"
-          :clearable="false"
-        >
-        </el-date-picker>
-        <el-button @click="addChartData">Graph it</el-button>
-      </div>
-      <div>
-        <client-only>
-          <line-chart :chart-data="chartData" :options="options"></line-chart>
-        </client-only>
-      </div>
-    </div>
+    <ChartBox ref="chartBox" :latLng="latLng"  />
+
   </div>
 </template>
 
 <script>
-let SunCalc = require("suncalc");
-
+const moment = require('moment-timezone');
+var tzlookup = require("tz-lookup");
 export default {
   data() {
     return {
@@ -81,48 +64,6 @@ export default {
       latLng: {
         lat: 58.365,
         lng: 26.743,
-      },
-      range: [],
-      chartData: {
-        labels: [],
-        datasets: [
-          {
-            label: "Day lenght",
-            data: [],
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1,
-          },
-        ],
-      },
-      options: {
-        //responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          yAxes: [
-            {
-              display: true,
-              ticks: {
-                suggestedMax: 24,
-                steps: 10,
-                stepValue: 4,
-                beginAtZero: true, // minimum value will be 0.
-              },
-              scaleLabel: {
-                display: true,
-                labelString: "Day Lenght (Decimal hours)",
-              },
-            },
-          ],
-          xAxes: [
-            {
-              display: true,
-              scaleLabel: {
-                display: true,
-                labelString: "Date",
-              },
-            },
-          ],
-        },
       },
     };
   },
@@ -141,8 +82,8 @@ export default {
       }
     },
     calcDayLenght() {
-      console.log(isNaN(this.latLng.lat) || isNaN(this.latLng.lng));
-      console.log(this.latLng);
+
+      /*
       let p = Math.asin(0.39795 * Math.cos(0.2163108 + 2 * Math.atan(0.9671396 * Math.tan(0.0086 * (this.dayOfTheYear(this.date) - 186)))));
       let pi = Math.PI;
       //console.log(pi)
@@ -159,23 +100,12 @@ export default {
           );
       //console.log(daylightamount)
       this.dayLenght = this.convertTime(daylightamount);
-      let time = this.getTime(this.date);
-      this.sunrise = this.getSunrise(time);
-      this.sunset = this.getSunset(time);
-    },
-    calcdayLenght(date) {
-      let p = Math.asin(0.39795 * Math.cos(0.2163108 + 2 * Math.atan(0.9671396 * Math.tan(0.0086 * (this.dayOfTheYear(date) - 186))))
-      );
-      let pi = Math.PI;
-      //console.log(p)
-      let daylightamount = 24 - (24 / pi) * Math.acos((Math.sin((0.8333 * pi) / 180) + Math.sin((this.latLng.lat * pi) / 180) * Math.sin(p)) / (Math.cos((this.latLng.lat * pi) / 180) * Math.cos(p)));
-      //console.log(daylightamount)
-      return daylightamount;
-    },
-    dayOfTheYear(date) {
-      return Math.floor(
-        (date - new Date(date.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
-      );
+*/
+      let times = this.getTime(this.date, this.latLng.lat, this.latLng.lng);
+      let timezone = tzlookup(this.latLng.lat, this.latLng.lng)
+      this.dayLenght = this.convertTime(this.diffHours(times.sunrise, times.sunset))
+      this.sunrise = this.getSunrise(times, timezone);
+      this.sunset = this.getSunset(times, timezone);
     },
     convertTime(time) {
       let hours = Math.floor(time);
@@ -183,77 +113,34 @@ export default {
       if (isNaN(hours)) return "Day doesnt end or start";
       return hours + "h:" + minutes + "m";
     },
-    getSunrise(time) {
+    getSunrise(time, timezone) {
       if (isNaN(time.sunrise.getHours())) return "Day doesnt end or start";
+      
+      let sunrise = this.convertTZ(time.sunrise, timezone)
       return (
-        time.sunrise.getHours().toString().padStart(2, "0") +
+        sunrise.getHours().toString().padStart(2, "0") +
         ":" +
-        time.sunrise.getMinutes().toString().padStart(2, "0")
+        sunrise.getMinutes().toString().padStart(2, "0")
       );
     },
-    getSunset(time) {
+    getSunset(time, timezone) {
       if (isNaN(time.sunrise.getHours())) return "Day doesnt end or start";
+      let sunset = this.convertTZ(time.sunset, timezone)
       return (
-        time.sunset.getHours().toString().padStart(2, "0") +
+        sunset.getHours().toString().padStart(2, "0") +
         ":" +
-        time.sunset.getMinutes().toString().padStart(2, "0")
+        sunset.getMinutes().toString().padStart(2, "0")
       );
-    },
-    getTime(date) {
-      return SunCalc.getTimes(date, this.latLng.lat, this.latLng.lng);
     },
     addMarker(data) {
-      console.log(data.latlng);
       this.latLng.lat = data.latlng.lat;
       this.latLng.lng = data.latlng.lng;
       this.calcDayLenght();
-      if (this.range.length === 2) {
-        this.addChartData();
-      }
-      //console.log(this.range)
+      this.$refs.chartBox.addChartData()
     },
-    addDay(day) {
-      var date = new Date(day);
-      date.setDate(date.getDate() + 1);
-      return date;
-    },
-    getDates(startDate, stopDate) {
-      let dateArray = new Array();
-      let currentDate = startDate;
-      while (currentDate <= stopDate) {
-        dateArray.push(new Date(currentDate));
-        currentDate = this.addDay(currentDate);
-      }
-      //console.log(dateArray)
-      return dateArray;
-    },
-    addChartData() {
-      let days = this.getDates(this.range[0], this.range[1]);
-      //console.log(days)
-      let dayData = [];
-      //console.log(days.length)
-      for (let i = 0; i < days.length; i++) {
-        //console.log(days[i])
-        dayData.push(this.calcdayLenght(days[i]));
-      }
-      //console.log(dayData)
-
-      days.forEach(function (part, index, arr) {
-        arr[index] = part.toDateString();
-      });
-
-      this.chartData = {
-        labels: days,
-        datasets: [
-          {
-            label: "Day lenght",
-            data: dayData,
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1,
-          },
-        ],
-      };
-    },
+    convertTZ(date, tzString) {
+      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+    }
   },
 };
 </script>
@@ -270,10 +157,6 @@ export default {
   grid-column: 1;
   grid-row: 2;
 }
-.d {
-  grid-column: 2;
-  grid-row: 2;
-}
 
 .c > * {
   max-width: 200px;
@@ -281,10 +164,6 @@ export default {
   text-align: center;
 }
 
-.d > #head {
-  margin: auto;
-  text-align: center;
-}
 
 .c > * > p {
   padding: 5px;
@@ -310,10 +189,6 @@ export default {
   .c {
     grid-column: 1;
     grid-row: 2;
-  }
-  .d {
-    grid-column: 1;
-    grid-row: 3;
   }
 }
 
