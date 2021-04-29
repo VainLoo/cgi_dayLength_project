@@ -28,14 +28,47 @@
       >
       </el-date-picker>
 
+      <!--<el-button @click="calcDayLenght">Calculate</el-button>-->
+
       <p>Day Lenght:</p>
       <p>{{ dayLenght }}</p>
-      <p>Sunrise:</p>
-      <p>{{ sunrise }}</p>
-      <p>Sunset:</p>
-      <p>{{ sunset }}</p>
+      <div>
+        <p>Sunrise:</p>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="Local"
+          placement="top-start"
+        >
+          <span>{{ sunrise.local }} | </span>
+        </el-tooltip>
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="My timezone"
+          placement="top-start"
+        >
+          <span>{{ sunrise.mytime }}</span>
+        </el-tooltip>
+      </div>
 
-      <!--<el-button @click="calcDayLenght">Calculate</el-button>-->
+      <p>Sunset:</p>
+      <el-tooltip
+        class="item"
+        effect="dark"
+        content="Local"
+        placement="top-start"
+      >
+        <span>{{ sunset.local }} | </span>
+      </el-tooltip>
+      <el-tooltip
+        class="item"
+        effect="dark"
+        content="My timezone"
+        placement="top-start"
+      >
+        <span>{{ sunset.mytime }}</span>
+      </el-tooltip>
     </div>
   </div>
 </template>
@@ -49,8 +82,14 @@ export default {
     return {
       date: new Date(),
       dayLenght: "0",
-      sunrise: "",
-      sunset: "",
+      sunrise: {
+        local: "",
+        mytime: "",
+      },
+      sunset: {
+        local: "",
+        mytime: "",
+      },
       latLng: this.latLong,
     };
   },
@@ -81,10 +120,6 @@ export default {
       /* Old method for calculating day lenght
       let p = Math.asin(0.39795 * Math.cos(0.2163108 + 2 * Math.atan(0.9671396 * Math.tan(0.0086 * (this.dayOfTheYear(this.date) - 186)))));
       let pi = Math.PI;
-      //console.log(pi)
-      //console.log(this.dayOfTheYear(date))
-      //console.log(p)
-      //console.log(this.latLng.lat)
       let daylightamount =
         24 -
         (24 / pi) *
@@ -93,7 +128,6 @@ export default {
               Math.sin((this.latLng.lat * pi) / 180) * Math.sin(p)) /
               (Math.cos((this.latLng.lat * pi) / 180) * Math.cos(p))
           );
-      //console.log(daylightamount)
       this.dayLenght = this.convertTime(daylightamount);
     */
       let times = this.getTime(this.date, this.latLng.lat, this.latLng.lng);
@@ -101,8 +135,12 @@ export default {
       this.dayLenght = this.convertTime(
         this.diffHours(times.sunrise, times.sunset)
       );
-      this.sunrise = this.getSunrise(times, timezone);
-      this.sunset = this.getSunset(times, timezone);
+      let sunrise = this.getSunrise(times, timezone);
+      this.sunrise.local = sunrise[0];
+      this.sunrise.mytime = sunrise[1];
+      let sunset = this.getSunset(times, timezone);
+      this.sunset.local = sunset[0];
+      this.sunset.mytime = sunset[1];
     },
     convertTime(time) {
       let hours = Math.floor(time);
@@ -111,23 +149,29 @@ export default {
       return hours + "h:" + minutes + "m";
     },
     getSunrise(time, timezone) {
-      if (isNaN(time.sunrise.getHours())) return "Polar night/day";
+      if (isNaN(time.sunrise.getHours())) return ["-","-"];
 
       let sunrise = this.convertTZ(time.sunrise, timezone);
-      return (
+      return [
         sunrise.getHours().toString().padStart(2, "0") +
-        ":" +
-        sunrise.getMinutes().toString().padStart(2, "0")
-      );
+          ":" +
+          sunrise.getMinutes().toString().padStart(2, "0"),
+        time.sunrise.getHours().toString().padStart(2, "0") +
+          ":" +
+          time.sunrise.getMinutes().toString().padStart(2, "0"),
+      ];
     },
     getSunset(time, timezone) {
-      if (isNaN(time.sunrise.getHours())) return "Polar night/day";
+      if (isNaN(time.sunset.getHours())) return ["-","-"];
       let sunset = this.convertTZ(time.sunset, timezone);
-      return (
+      return [
         sunset.getHours().toString().padStart(2, "0") +
-        ":" +
-        sunset.getMinutes().toString().padStart(2, "0")
-      );
+          ":" +
+          sunset.getMinutes().toString().padStart(2, "0"),
+        time.sunset.getHours().toString().padStart(2, "0") +
+          ":" +
+          time.sunset.getMinutes().toString().padStart(2, "0"),
+      ];
     },
     convertTZ(date, tzString) {
       return new Date(

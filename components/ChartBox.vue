@@ -4,7 +4,7 @@
       <el-date-picker
         v-model="range"
         type="daterange"
-        range-separator="|"
+        range-separator="-"
         start-placeholder="Start date"
         end-placeholder="End date"
         @change="redoChart"
@@ -13,7 +13,9 @@
       </el-date-picker>
 
       <div>
-        <el-checkbox v-model="checked" @change="redoChart">Compare 2 points</el-checkbox>
+        <el-checkbox v-model="checked" @change="redoChart"
+          >Compare 2 points</el-checkbox
+        >
         <div v-if="checked">
           <div>
             <p>Latitude</p>
@@ -38,7 +40,6 @@
           </div>
         </div>
       </div>
-      <!--<el-button @click="addChartData">Graph it</el-button>-->
     </div>
     <div>
       <client-only>
@@ -80,7 +81,7 @@ export default {
               ticks: {
                 max: 24,
                 beginAtZero: true,
-                stepSize: 4
+                stepSize: 4,
               },
               scaleLabel: {
                 display: true,
@@ -201,7 +202,7 @@ export default {
       } else {
         this.addChartData(false);
       }
-    }
+    },
   },
 };
 </script>
