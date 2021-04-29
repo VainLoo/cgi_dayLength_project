@@ -2,10 +2,16 @@
   <div class="box b">
     <div id="map-wrap" style="height: 300pt">
       <client-only>
-        <l-map :zoom="6" :center="[58.365, 26.743]" @click="addMarker">
+        <l-map
+          ref="myMap"
+          :zoom="6"
+          :center="[58.365, 26.743]"
+          @click="addMarker"
+          :maxBounds="bounds"
+          :minZoom="2"
+        >
           <l-tile-layer
             url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-            :noWrap="true"
           ></l-tile-layer>
           <l-marker :lat-lng="latLng"></l-marker>
         </l-map>
@@ -13,14 +19,20 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   props: ["latLong"],
   data() {
     return {
       latLng: this.latLong,
+      bounds: {},
     };
+  },
+  mounted() {
+    this.bounds = this.$L.latLngBounds([
+      [-90, -180],
+      [90, 180],
+    ]);
   },
   methods: {
     addMarker(data) {
@@ -32,7 +44,6 @@ export default {
       } else if (data.latlng.lng < -180) {
         this.latLng.lng = -180;
       }
-    
       this.$emit("newCords");
     },
   },
