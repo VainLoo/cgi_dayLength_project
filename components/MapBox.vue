@@ -11,7 +11,7 @@
           :minZoom="2"
         >
           <l-tile-layer
-            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
           ></l-tile-layer>
           <l-marker :lat-lng="latLng"></l-marker>
         </l-map>
