@@ -6,7 +6,6 @@
       <DataBox @updates="update" ref="dataBox" :latLong="latLng" />
       <ChartBox ref="chartBox" :latLng="latLng"  />
       <MapBox @newCords="update" ref="mapBox" :latLong="latLng"/>
-
   </div>
 </template>
 

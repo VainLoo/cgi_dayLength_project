@@ -173,12 +173,12 @@ export default {
           time.sunset.getMinutes().toString().padStart(2, "0"),
       ];
     },
-    convertTZ(date, tzString) {
+    convertTZ(date, timezone) {
       return new Date(
         (typeof date === "string"
           ? new Date(date)
           : date
-        ).toLocaleString("en-US", { timeZone: tzString })
+        ).toLocaleString("en-US", { timeZone: timezone })
       );
     },
   },
