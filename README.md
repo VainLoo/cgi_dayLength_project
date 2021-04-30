@@ -18,3 +18,12 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+
+## Running with Docker
+```
+$ docker build -t cgi_day_length_project .
+
+$ docker run -it -p 3000:3000 cgi_day_length_project
+```
+
+Now running on http://localhost:3000/
