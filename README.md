@@ -1,7 +1,7 @@
-# cgi_dayLength_project
+# CGI Day Length Project
 
 Project for CGI summer internship candidacy.
-This is a Nuxt.js based project using JavaScript. Further explanation about the project can be found in the Wiki.
+This is a Nuxt.js based project using JavaScript. Further explanation about the project can be found in the Wiki in Estonian.
 
 I have prepared 2 explanations for getting the project up and running. First one requires Node.js and the second one Docker. But the project can also be found already running on Heroku:  
 cgi-day-lenght-calculator.herokuapp.com.
