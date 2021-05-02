@@ -54,7 +54,9 @@ export default {
   props: ["latLng"],
   data() {
     return {
+      //The default date range is current date - 60 days from now
       range: [new Date(), new Date().setDate(new Date().getDate() + 60)],
+      //Second comparsion point values.
       latLng2: {
         lat: 0,
         lng: 0,
@@ -72,7 +74,6 @@ export default {
         ],
       },
       options: {
-        //responsive: true,
         maintainAspectRatio: false,
         scales: {
           yAxes: [
@@ -103,9 +104,11 @@ export default {
     };
   },
   created() {
+    //Fill the chart on creation.
     this.addChartData(false);
   },
   methods: {
+    //When latitude value changes
     handleChangeLat(event) {
       if (typeof event === "undefined") {
         this.latLng2.lat = 0;
@@ -114,6 +117,7 @@ export default {
       }
       this.addChartData(true);
     },
+    //When longitude value changes
     handleChangeLng(event) {
       if (typeof event === "undefined") {
         this.latLng2.lng = 0;
@@ -122,6 +126,7 @@ export default {
       }
       this.addChartData(true);
     },
+    //Peforms needed operations for getting data for the chart and filling it.
     addChartData(compare) {
       if (this.range.length === 2) {
         let days = this.getDates(this.range[0], this.range[1]);
@@ -131,6 +136,8 @@ export default {
         }
 
         let datasets = [];
+
+        //if we have a comparison point
         if (compare) {
           let dayData2 = [];
           for (let i = 0; i < days.length; i++) {
@@ -168,23 +175,25 @@ export default {
             datasets: datasets,
           };
         }
-
+        //Make date labels readable.
         days.forEach(function (part, index, arr) {
           arr[index] = part.toDateString();
         });
       }
     },
+    //Returns time difference between sunset and sunrise.
     calcdayLenght(date, coords) {
       let times = this.getTime(date, coords.lat, coords.lng);
       return this.diffHours(times.sunset, times.sunrise);
     },
-
+    //Retruns a new date where the date has incread by one.
     addDay(day) {
       var date = new Date(day);
       date.setDate(date.getDate() + 1);
       return date;
     },
-
+    //Gets all the dates between two dates.
+    //Returns an array of all the dates.
     getDates(startDate, stopDate) {
       let dateArray = new Array();
       let currentDate = startDate;
@@ -192,10 +201,10 @@ export default {
         dateArray.push(new Date(currentDate));
         currentDate = this.addDay(currentDate);
       }
-      //console.log(dateArray)
       return dateArray;
     },
-
+    //For calling for a chart update.
+    //Chooses if it is a comparison chart or not.
     redoChart() {
       if (this.checked) {
         this.addChartData(true);

@@ -29,12 +29,14 @@ export default {
     };
   },
   mounted() {
+    //Sets the map bounds.
     this.bounds = this.$L.latLngBounds([
       [-90, -180],
       [90, 180],
     ]);
   },
   methods: {
+    //Adds a marken on the map.
     addMarker(data) {
       this.latLng.lat = this.roundCoords(data.latlng.lat);
       this.latLng.lng = this.roundCoords(data.latlng.lng);
@@ -44,6 +46,7 @@ export default {
       } else if (data.latlng.lng < -180) {
         this.latLng.lng = -180;
       }
+      //Update the values
       this.$emit("newCords");
     },
   },

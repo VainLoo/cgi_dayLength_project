@@ -92,10 +92,12 @@ export default {
       latLng: this.latLong,
     };
   },
+  //On creation, calculate day lenght
   created() {
     this.calcDayLenght();
   },
   methods: {
+    //When latitude value changes
     handleChangeLat(event) {
       if (typeof event === "undefined") {
         this.latLng.lat = 58.365;
@@ -104,6 +106,7 @@ export default {
       }
       this.callUpdate();
     },
+    //When longitude value changes
     handleChangeLng(event) {
       if (typeof event === "undefined") {
         this.latLng.lng = 26.743;
@@ -112,7 +115,7 @@ export default {
       }
       this.callUpdate();
     },
-    callUpdate() {
+    callUpdate() { //Tell parent object to update the project values
       this.$emit("updates");
     },
     calcDayLenght() {
@@ -130,7 +133,8 @@ export default {
       this.dayLenght = this.convertTime(daylightamount);
     */
       let times = this.getTime(this.date, this.latLng.lat, this.latLng.lng);
-      let timezone = tzlookup(this.latLng.lat, this.latLng.lng);
+      let timezone = tzlookup(this.latLng.lat, this.latLng.lng); //Gets timezone of the point
+      //Gets the day lenght in (hours:minutes)
       this.dayLenght = this.convertTime(
         this.diffHours(times.sunrise, times.sunset)
       );
@@ -141,12 +145,16 @@ export default {
       this.sunset.local = sunset[0];
       this.sunset.mytime = sunset[1];
     },
+    //time - amount of time in decimalhours 
+    //Returns the equivalent value in the format (xxh:xxm)
     convertTime(time) {
       let hours = Math.floor(time);
       let minutes = Math.ceil((time - Math.floor(time)) * 60);
       if (isNaN(hours)) return "Polar night/day";
       return hours + "h:" + minutes + "m";
     },
+    //Gets the sunrise times for two timezones.
+    //Returns array of two Strings.
     getSunrise(time, timezone) {
       if (isNaN(time.sunrise.getHours())) return ["-","-"];
 
@@ -160,6 +168,8 @@ export default {
           time.sunrise.getMinutes().toString().padStart(2, "0"),
       ];
     },
+    //Gets the sunset times for two timezones.
+    //Returns array of two Strings.
     getSunset(time, timezone) {
       if (isNaN(time.sunset.getHours())) return ["-","-"];
       let sunset = this.convertTZ(time.sunset, timezone);
@@ -172,6 +182,7 @@ export default {
           time.sunset.getMinutes().toString().padStart(2, "0"),
       ];
     },
+    //Given a Date and a timezone returns a new Date, that reflects the time in the given timezone.
     convertTZ(date, timezone) {
       return new Date(
         (typeof date === "string"

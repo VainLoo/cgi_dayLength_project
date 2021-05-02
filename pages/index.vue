@@ -14,14 +14,15 @@
 export default {
   data() {
     return {
-      latLng: {
+      latLng: { //For storing latitude/longitude values
         lat: 58.365,
         lng: 26.743,
       }
     };
   },
   methods: {
-    update() {
+    //Causes updates to be made.
+    update() { 
       this.$refs.dataBox.calcDayLenght();
       this.$refs.chartBox.redoChart();
     }
