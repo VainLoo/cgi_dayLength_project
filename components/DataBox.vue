@@ -74,7 +74,6 @@
 </template>
 
 <script>
-const moment = require("moment-timezone");
 var tzlookup = require("tz-lookup");
 export default {
   props: ["latLong"],

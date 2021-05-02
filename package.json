@@ -10,9 +10,7 @@
   },
   "dependencies": {
     "chart.js": "^2.9.3",
-    "core-js": "^3.9.1",
     "element-ui": "^2.15.1",
-    "moment-timezone": "^0.5.33",
     "nuxt": "^2.15.3",
     "nuxt-leaflet": "0.0.25",
     "suncalc": "^1.8.0",
